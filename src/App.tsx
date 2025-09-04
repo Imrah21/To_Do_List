@@ -146,8 +146,6 @@ const handleUpdateTodo = async (id: string, updates: any) => {
     );
   }
 
-  
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -164,7 +162,7 @@ const handleUpdateTodo = async (id: string, updates: any) => {
 
         <Box sx={{ mb: 4, textAlign: 'center' }}>
             <Typography variant="h3" component="h1" gutterBottom>
-              Todo List
+              To-Do List
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
               Making Your Day Easier ✨
