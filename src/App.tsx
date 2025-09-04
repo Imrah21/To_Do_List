@@ -8,6 +8,9 @@ import  IconButton from '@mui/material/IconButton';
 import  CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Brightness4, Brightness7 } from '@mui/icons-material';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import Fade from '@mui/material/Fade';
 //Components
 import { TodoForm } from './components/TodoForm/TodoForm';
 import { TodoList } from './components/TodoList/TodoList';
@@ -16,9 +19,9 @@ import './App.css';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
+  const [toast, setToast] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' | 'warning' | 'info' });
   const { todos, loading, createTodo, updateTodo, deleteTodo, toggleTodo } = useTodos();
-
-
+  
   const theme = createTheme({
     palette: {
       mode: darkMode ? 'dark' : 'light',
@@ -83,6 +86,52 @@ function App() {
     setDarkMode(!darkMode);
   };
 
+  // Toast functions
+const showToast = (message: string, severity: 'success' | 'error' | 'warning' | 'info' = 'success') => {
+  setToast({ open: true, message, severity });
+};
+
+const hideToast = () => {
+  setToast(prev => ({ ...prev, open: false }));
+};
+
+// Toasts for CRUD functions
+const handleCreateTodo = async (todoData: any) => {
+  try {
+    await createTodo(todoData);
+    showToast('Task added! 🎉', 'success');
+  } catch (error) {
+    showToast('Failed to add task', 'error');
+  }
+};
+
+const handleDeleteTodo = async (id: string) => {
+  try {
+    await deleteTodo(id);
+    showToast('Task deleted! 🗑️', 'warning');
+  } catch (error) {
+    showToast('Failed to delete task', 'error');
+  }
+};
+
+const handleToggleTodo = async (id: string) => {
+  try {
+    await toggleTodo(id);
+    showToast('Task updated! ✏️', 'info');
+  } catch (error) {
+    showToast('Failed to update task', 'error');
+  }
+};
+
+const handleUpdateTodo = async (id: string, updates: any) => {
+  try {
+    await updateTodo(id, updates);
+    showToast('Task updated successfully! ✏️', 'info');
+  } catch (error) {
+    showToast('Failed to update task', 'error');
+  }
+};
+
   if (loading) 
   {
     return (
@@ -96,6 +145,8 @@ function App() {
       </ThemeProvider>
     );
   }
+
+  
 
   return (
     <ThemeProvider theme={theme}>
@@ -134,7 +185,7 @@ function App() {
               flex: { xs: '1', md: '0 0 40%' }, // Fixed width on desktop, full width on mobile
               minWidth: 0 
             }}>
-              <TodoForm onSubmit={createTodo} />
+              <TodoForm onSubmit={handleCreateTodo} />
             </Box>
 
             {/* Right column - Todo List */}
@@ -145,12 +196,30 @@ function App() {
             }}>
               <TodoList
                 todos={todos}
-                onToggle={toggleTodo}
-                onDelete={deleteTodo}
-                onUpdate={updateTodo}
+              onToggle={handleToggleTodo}
+              onDelete={handleDeleteTodo}
+              onUpdate={handleUpdateTodo}
               />
             </Box>
           </Box>
+
+           {/* Toast Notification */}
+          <Snackbar 
+            open={toast.open} 
+            autoHideDuration={3000} 
+            onClose={hideToast}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            TransitionComponent={Fade}
+          >
+            <Alert 
+              onClose={hideToast} 
+              severity={toast.severity} 
+              sx={{ width: '100%' }}
+              variant="filled"
+            >
+              {toast.message}
+            </Alert>
+          </Snackbar>
         </Container>
     </ThemeProvider>
   );
