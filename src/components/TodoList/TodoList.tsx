@@ -1,6 +1,9 @@
 import React from 'react';
-import { Box, Typography, Paper } from '@mui/material';
-import { Todo, UpdateTodoInput } from '../../types/todo';
+//MUI Imports
+import  Paper from '@mui/material/Paper';
+import  Typography from '@mui/material/Typography';
+import  Box from '@mui/material/Box';
+import type { Todo, UpdateTodoInput } from '../../types/todo';
 import { TodoItem } from '../TodoItem/TodoItem';
 
 interface TodoListProps {

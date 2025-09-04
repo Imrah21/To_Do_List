@@ -1,27 +1,96 @@
-import { Container, Typography, Box, CssBaseline } from '@mui/material';
+import { useState } from 'react';
+//MUI Imports
+import  Container from '@mui/material/Container';
+import  Typography from '@mui/material/Typography';
+import  Box from '@mui/material/Box';
+import  Paper from '@mui/material/Paper';
+import  IconButton from '@mui/material/IconButton';
+import  CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Brightness4, Brightness7 } from '@mui/icons-material';
+//Components
 import { TodoForm } from './components/TodoForm/TodoForm';
 import { TodoList } from './components/TodoList/TodoList';
 import { useTodos } from './hooks/useTodos';
-
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#1976d2',
-    },
-  },
-});
+import './App.css';
 
 function App() {
+  const [darkMode, setDarkMode] = useState(false);
   const { todos, loading, createTodo, updateTodo, deleteTodo, toggleTodo } = useTodos();
+
+
+  const theme = createTheme({
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+      primary: { 
+        main: darkMode ? '#90caf9' : '#1976d2' 
+      },
+      secondary: { 
+        main: darkMode ? '#f48fb1' : '#dc004e' 
+      },
+      background: {
+        default: darkMode ? '#121212' : '#f5f5f5',
+        paper: darkMode ? '#1e1e1e' : '#ffffff'
+      }
+    },
+    typography: {
+      h3: { 
+        fontFamily: "Finger Paint", 
+        fontWeight: 700,
+        background: darkMode 
+          ? 'linear-gradient(45deg, #90caf9, #f48fb1)' 
+          : 'linear-gradient(45deg, #1976d2, #dc004e)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text'
+      }
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            fontFamily: "Finger Paint", 
+            borderRadius: 12,
+            textTransform: 'none',
+            boxShadow: darkMode 
+              ? '0 4px 14px 0 rgba(144, 202, 249, 0.2)'
+              : '0 4px 14px 0 rgba(25, 118, 210, 0.2)',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: darkMode 
+                ? '0 8px 25px 0 rgba(144, 202, 249, 0.3)'
+                : '0 8px 25px 0 rgba(25, 118, 210, 0.3)'
+            }
+          }
+        }
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            borderRadius: 16,
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const toggleTheme = () => {
+    setDarkMode(!darkMode);
+  };
 
   if (loading) 
   {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Container maxWidth="md" sx={{ py: 4 }}>
+         <Container maxWidth="md" sx={{ py: 4
+      }}
+    >
           <Typography>Loading...</Typography>
         </Container>
       </ThemeProvider>
@@ -31,24 +100,58 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h3" component="h1" gutterBottom>
-            Todo List
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            Manage your tasks efficiently
-          </Typography>
-        </Box>
+      <Container maxWidth="md" sx={{ py: 4}}>
 
-        <TodoForm onSubmit={createTodo} />
-        <TodoList
-          todos={todos}
-          onToggle={toggleTodo}
-          onDelete={deleteTodo}
-          onUpdate={updateTodo}
-        />
-      </Container>
+         {/* Theme Toggle Button */}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+            <Paper elevation={2} sx={{ borderRadius: '50%' }}>
+              <IconButton onClick={toggleTheme} color="primary">
+                {darkMode ? <Brightness7 /> : <Brightness4 />}
+              </IconButton>
+            </Paper>
+          </Box>
+
+        <Box sx={{ mb: 4, textAlign: 'center' }}>
+            <Typography variant="h3" component="h1" gutterBottom>
+              Todo List
+            </Typography>
+            <Typography variant="subtitle1" color="text.secondary">
+              Making Your Day Easier ✨
+            </Typography>
+          </Box>
+
+         {/* Two-column layout */}
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 3, 
+            alignItems: 'flex-start',
+            flexDirection: { xs: 'column', md: 'row' } // Stack on mobile, side-by-side on desktop
+          }}>
+
+
+            {/* Left column - Form */}
+            <Box sx={{ 
+              flex: { xs: '1', md: '0 0 40%' }, // Fixed width on desktop, full width on mobile
+              minWidth: 0 
+            }}>
+              <TodoForm onSubmit={createTodo} />
+            </Box>
+
+            {/* Right column - Todo List */}
+            <Box sx={{ 
+              flex: 1,
+              md: '0 0 60%',
+              minWidth: 0
+            }}>
+              <TodoList
+                todos={todos}
+                onToggle={toggleTodo}
+                onDelete={deleteTodo}
+                onUpdate={updateTodo}
+              />
+            </Box>
+          </Box>
+        </Container>
     </ThemeProvider>
   );
 }
