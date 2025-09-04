@@ -11,6 +11,7 @@ import { Brightness4, Brightness7 } from '@mui/icons-material';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Fade from '@mui/material/Fade';
+import { Fab } from '@mui/material';
 //Components
 import { TodoForm } from './components/TodoForm/TodoForm';
 import { TodoList } from './components/TodoList/TodoList';
@@ -151,14 +152,19 @@ const handleUpdateTodo = async (id: string, updates: any) => {
       <CssBaseline />
       <Container maxWidth="md" sx={{ py: 4}}>
 
-         {/* Theme Toggle Button */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-            <Paper elevation={2} sx={{ borderRadius: '50%' }}>
-              <IconButton onClick={toggleTheme} color="primary">
-                {darkMode ? <Brightness7 /> : <Brightness4 />}
-              </IconButton>
-            </Paper>
-          </Box>
+        {/* Floating Theme Toggle */}
+      <Fab 
+      color="primary" 
+      onClick={toggleTheme}
+        sx={{ 
+        position: 'fixed',
+        bottom: 16,
+        right: 16,
+        zIndex: 1000
+        }}
+        >
+        {darkMode ? <Brightness7 /> : <Brightness4 />}
+      </Fab>
 
         <Box sx={{ mb: 4, textAlign: 'center' }}>
             <Typography variant="h3" component="h1" gutterBottom>
