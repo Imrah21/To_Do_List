@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 //MUI Imports
 import  Container from '@mui/material/Container';
 import  Typography from '@mui/material/Typography';
 import  Box from '@mui/material/Box';
-import  Paper from '@mui/material/Paper';
-import  IconButton from '@mui/material/IconButton';
+import  Add from '@mui/icons-material/Add';
+import  ViewList from '@mui/icons-material/ViewList';
 import  CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Brightness4, Brightness7 } from '@mui/icons-material';
@@ -12,14 +12,18 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Fade from '@mui/material/Fade';
 import { Fab } from '@mui/material';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 //Components
 import { TodoForm } from './components/TodoForm/TodoForm';
 import { TodoList } from './components/TodoList/TodoList';
 import { useTodos } from './hooks/useTodos';
+import './components/Clipboard/ClipboardDesign.css';
 import './App.css';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<'add' | 'view'>('add');
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' | 'warning' | 'info' });
   const { todos, loading, createTodo, updateTodo, deleteTodo, toggleTodo } = useTodos();
   
@@ -82,6 +86,23 @@ function App() {
       }
     }
   });
+
+  useEffect(() => {
+  // Apply theme to body element for background gradient
+  if (darkMode) {
+    document.body.setAttribute('data-theme', 'dark');
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.removeAttribute('data-theme');
+    document.body.classList.remove('dark-mode');
+  }
+
+  // Cleanup function to remove classes when component unmounts
+  return () => {
+    document.body.removeAttribute('data-theme');
+    document.body.classList.remove('dark-mode');
+  };
+}, [darkMode]);
 
   const toggleTheme = () => {
     setDarkMode(!darkMode);
@@ -150,9 +171,80 @@ const handleUpdateTodo = async (id: string, updates: any) => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="md" sx={{ py: 4}}>
+       {/* Clipboard Container */} 
+        <div className={`clipboard-background ${darkMode ? 'dark-mode' : ''}`} data-theme={darkMode ? 'dark' : 'light'}>
+          {/* Clipboard Clip */}
+          <div className="clipboard-clip"></div>
+          {/* Navigation Tabs */}
+          <Box className={`clipboard-nav ${darkMode ? 'dark-mode' : ''}`} data-theme={darkMode ? 'dark' : 'light'}>
+           <Tabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)} textColor="primary" indicatorColor="primary" variant="fullWidth" sx={{ width: '100%', maxWidth: 600 }} centered >
+    <Tab 
+      label="Add Task" 
+      icon={<Add />} 
+      iconPosition="start" 
+      value="add" 
+    />
+    <Tab 
+      label={`View Tasks (${todos.length})`} 
+      icon={<ViewList />} 
+      iconPosition="start" 
+      value="view" 
+      sx={{ fontFamily: 'Finger Paint' }}
+    />
+  </Tabs>
+          </Box>
 
-        {/* Floating Theme Toggle */}
+          {/* Content Area */}
+          <div className="clipboard-content">
+            <Box sx={{ mb: 4, textAlign: 'center' }}>
+              <Typography variant="h3" component="h1" gutterBottom>
+                To-Do List
+              </Typography>
+              <Typography variant="subtitle1" color="text.secondary">
+                Making Your Day Easier ✨
+              </Typography>
+            </Box>
+
+            {/* Tab Content */}
+            <Box sx={{ minHeight: '400px' }}>
+              {activeTab === 'add' ? (
+                <Box sx={{ maxWidth: '500px', margin: '0 auto' }}>
+                  <TodoForm onSubmit={handleCreateTodo} />
+                  
+                  {/* Show recent tasks preview */}
+                  {todos.length > 0 && (
+                    <Box sx={{ mt: 3, p: 2, backgroundColor: 'action.hover', borderRadius: 2 }}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        Recent Tasks:
+                      </Typography>
+                      {todos.slice(0, 3).map((todo) => (
+                        <Typography key={todo.id} variant="body2" sx={{ opacity: 0.7, fontSize: '0.875rem' }}>
+                          • {todo.title}
+                        </Typography>
+                      ))}
+                      {todos.length > 3 && (
+                        <Typography variant="body2" sx={{ opacity: 0.5, fontStyle: 'italic' }}>
+                          +{todos.length - 3} more tasks...
+                        </Typography>
+                      )}
+                    </Box>
+                  )}
+                </Box>
+              ) : (
+                <Box sx={{ maxWidth: '600px', margin: '0 auto' }}>
+                  <TodoList
+                    todos={todos}
+                    onToggle={handleToggleTodo}
+                    onDelete={handleDeleteTodo}
+                    onUpdate={handleUpdateTodo}
+                  />
+                </Box>
+              )}
+            </Box>
+          </div>
+        </div>
+
+        {/* Fab Icon Toggle */}
       <Fab 
       color="primary" 
       onClick={toggleTheme}
@@ -165,47 +257,6 @@ const handleUpdateTodo = async (id: string, updates: any) => {
         >
         {darkMode ? <Brightness7 /> : <Brightness4 />}
       </Fab>
-
-        <Box sx={{ mb: 4, textAlign: 'center' }}>
-            <Typography variant="h3" component="h1" gutterBottom>
-              To-Do List
-            </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
-              Making Your Day Easier ✨
-            </Typography>
-          </Box>
-
-         {/* Two-column layout */}
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 3, 
-            alignItems: 'flex-start',
-            flexDirection: { xs: 'column', md: 'row' } // Stack on mobile, side-by-side on desktop
-          }}>
-
-
-            {/* Left column - Form */}
-            <Box sx={{ 
-              flex: { xs: '1', md: '0 0 40%' }, // Fixed width on desktop, full width on mobile
-              minWidth: 0 
-            }}>
-              <TodoForm onSubmit={handleCreateTodo} />
-            </Box>
-
-            {/* Right column - Todo List */}
-            <Box sx={{ 
-              flex: 1,
-              md: '0 0 60%',
-              minWidth: 0
-            }}>
-              <TodoList
-                todos={todos}
-              onToggle={handleToggleTodo}
-              onDelete={handleDeleteTodo}
-              onUpdate={handleUpdateTodo}
-              />
-            </Box>
-          </Box>
 
            {/* Toast Notification */}
           <Snackbar 
@@ -224,8 +275,7 @@ const handleUpdateTodo = async (id: string, updates: any) => {
               {toast.message}
             </Alert>
           </Snackbar>
-        </Container>
-    </ThemeProvider>
+      </ThemeProvider>
   );
 }
 
