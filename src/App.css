@@ -7,7 +7,6 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  /* Remove the max-width constraint to allow full gradient background */
 }
 
 .card {
@@ -39,7 +38,6 @@
 
 .MuiTextField-root .MuiOutlinedInput-root:hover {
   background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px);
 }
 
 .MuiTextField-root .MuiOutlinedInput-root.Mui-focused {

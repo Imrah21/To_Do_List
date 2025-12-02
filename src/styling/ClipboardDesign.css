@@ -274,7 +274,6 @@
 }
 
 /* Remove particle effects from clipboard */
-
 @keyframes particleFloat {
   0% {
     transform: translateY(0px);
